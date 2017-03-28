@@ -7,6 +7,8 @@ var planetPage = require('../pages/planet.js')
 var starshipPage = require('../pages/starship.js')
 var helpPage = require('../pages/help.js')
 var privacyPage = require('../pages/privacy.js')
+var aboutPage = require('../pages/about.js')
+var contactPage = require('../pages/contact.js')
 
 module.exports = {
   'default e2e tests': function (browser) {
@@ -164,6 +166,90 @@ module.exports = {
       .getText(privacyPage.elements.privacyTitle, function(text) {
         this.assert.equal(text.value, 'Privacy & Terms')
       })
+      .end()
+  },
+
+  'verify that button has expected values when select is clicked randomly in a single browser session': function (browser) {
+    browser
+      .windowMaximize()
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .setValue(ui.dev.select,ui.dev.selectValue.starship)
+      .click(ui.dev.select)
+      .pause(1000)
+      .keys(['\uE006'])
+      .pause(3000)
+      .assert.elementPresent(starshipPage.elements.randomStarshipButton) //Check for Starship Button
+      .getText(starshipPage.elements.randomStarshipButton, function(result) {
+        this.assert.equal(result.value,'public RANDOM STARSHIP')  //Check for STARSHIP Text
+      })
+      .pause(1000)
+      .setValue(ui.dev.select,ui.dev.selectValue.person)
+      .click(ui.dev.select)
+      .pause(1000)
+      .keys(['\uE006'])
+      .pause(3000)
+      .assert.elementPresent(personPage.elements.randomPersonButton) //Check for Person Button
+      .getText(personPage.elements.randomPersonButton, function(result) {
+        this.assert.equal(result.value,'face RANDOM PERSON')  //Check for STARSHIP Text
+      })
+      .pause(1000)
+      .setValue(ui.dev.select,ui.dev.selectValue.planet)  //Check for Planet Button
+      .click(ui.dev.select)
+      .pause(1000)
+      .keys(['\uE006'])
+      .pause(3000)
+      .assert.elementPresent(planetPage.elements.randomPlanetButton)  //Check for Planet Button
+      .getText(planetPage.elements.randomPlanetButton, function(result) {
+        this.assert.equal(result.value,'public RANDOM PLANET')
+      })
+      .end()
+  },
+
+  "verify that About page loads & it's URL is correct": function (browser) {
+    browser
+      .windowMaximize()
+      .url(browser.globals.devServerURL)
+      .click(aboutPage.elements.aboutLink)
+      .waitForElementVisible('body', 1000)
+      .assert.elementPresent(aboutPage.elements.aboutTitle)
+      .getText(aboutPage.elements.aboutTitle, function(result) {
+        this.assert.equal(result.value,'About')
+      })
+      .assert.urlEquals('http://www.alexckramer.com/force-vue/#/about')
+      .end()
+  },
+
+  "verify that Contact page loads & it's URL is correct": function (browser) {
+    browser
+      .windowMaximize()
+      .url(browser.globals.devServerURL)
+      .click(contactPage.elements.contactLink)
+      .waitForElementVisible('body', 1000)
+      .assert.elementPresent(contactPage.elements.contactTitle)
+      .getText(contactPage.elements.contactTitle, function(result) {
+        this.assert.equal(result.value,'Contact')
+      })
+      .assert.urlEquals('http://www.alexckramer.com/force-vue/#/contact')
+      .end()
+  },
+
+  "verify that Contact page form accepts inputs and form submission works": function (browser) {
+    browser
+      .windowMaximize()
+      .url(browser.globals.devServerURL)
+      .click(contactPage.elements.contactLink)
+      .waitForElementVisible('body', 1000)
+      .assert.elementPresent(contactPage.elements.contactInfoName)
+      .assert.elementPresent(contactPage.elements.contactInfoEmail)
+      .assert.elementPresent(contactPage.elements.contactInfoNote)
+      .clearValue(contactPage.elements.contactInfoName)
+      .setValue(contactPage.elements.contactInfoName, 'foo')
+      .clearValue(contactPage.elements.contactInfoEmail)
+      .setValue(contactPage.elements.contactInfoEmail, 'foo@bar.com')
+      .clearValue(contactPage.elements.contactInfoNote)
+      .setValue(contactPage.elements.contactInfoNote, 'Foo Bar')
+      .click(contactPage.elements.submitButton)
       .end()
   }
 }
